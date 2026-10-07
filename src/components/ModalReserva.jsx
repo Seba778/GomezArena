@@ -72,7 +72,7 @@ function ModalReserva({ evento, onCerrar }) {
     }
 
     try {
-      const res = await fetch("https://vvresxffmbeiqgpzdbrk.supabase.co/functions/v1/crear-checkout", {
+      const res = await fetch("https://vvresxffmbeiqgpzdbrk.supabase.co/functions/v1/webhook-stripe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

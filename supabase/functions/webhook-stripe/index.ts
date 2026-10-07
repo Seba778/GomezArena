@@ -33,7 +33,13 @@ serve(async (req) => {
           });
         }
       }
-      return new Response(JSON.stringify({ received: true }));
+      return new Response(JSON.stringify({ received: true }), {
+        status: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        },
+      });
     }
 
     // Si es un request desde el frontend para crear checkout
@@ -63,7 +69,13 @@ serve(async (req) => {
       ],
     });
 
-    return new Response(JSON.stringify({ url: session.url }));
+    return new Response(JSON.stringify({ url: session.url }), {
+      status: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      },
+    });
   } catch (err: any) {
     console.error(err);
     return new Response(JSON.stringify({ error: err.message }), { status: 500 });
