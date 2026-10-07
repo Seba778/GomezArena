@@ -66,36 +66,17 @@ function ModalReserva({ evento, onCerrar }) {
 
   const handleConfirmBooking = async () => {
     if (!selectedTable || !selectedCategory) return;
+    const link = selectedCategory === 'red' ? evento.link_red : evento.link_blue;
+    if (!link) {
+      alert('Payment link not available yet. Please contact us.');
+      return;
+    }
     if (!customerName.trim() || !customerEmail.trim()) {
       alert('Please enter your name and email');
       return;
     }
-
-    try {
-      const res = await fetch("https://vvresxffmbeiqgpzdbrk.supabase.co/functions/v1/webhook-stripe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2cmVzeGZmbWJlaXFncHpkYnJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4Njc5ODYsImV4cCI6MjEwNjQ0Mzk4Nn0.IStw1z8LqrpMDRthM_KUnZRTpONxx9vH8ILkZPOLDOk"
-        },
-        body: JSON.stringify({
-          eventoId: evento.id,
-          numero: selectedTable,
-          categoria: selectedCategory,
-          nombre: customerName.trim(),
-          email: customerEmail.trim(),
-        }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        alert("Error creating Stripe session. Please try again.");
-      }
-    } catch (err) {
-      console.error("Error:", err);
-      alert("Connection error. Please try again.");
-    }
+    const emailParam = `?customer_email=${encodeURIComponent(customerEmail.trim())}`;
+    window.location.href = link + emailParam;
   };
 
   return (
