@@ -92,7 +92,8 @@ function ModalReserva({ evento, onCerrar }) {
       return;
     }
 
-    window.location.href = link;
+    const emailParam = `?customer_email=${encodeURIComponent(customerEmail.trim())}`;
+    window.location.href = link + emailParam;
   };
 
   return (
