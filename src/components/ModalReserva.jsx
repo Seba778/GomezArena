@@ -76,8 +76,7 @@ function ModalReserva({ evento, onCerrar }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2cmVzeGZmbWJlaXFncHpkYnJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4Njc5ODYsImV4cCI6MjEwNjQ0Mzk4Nn0.IStw1z8LqrpMDRthM_KUnZRTpONxx9vH8ILkZPOLDOk",
-          "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2cmVzeGZmbWJlaXFncHpkYnJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4Njc5ODYsImV4cCI6MjEwNjQ0Mzk4Nn0.IStw1z8LqrpMDRthM_KUnZRTpONxx9vH8ILkZPOLDOk"
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2cmVzeGZmbWJlaXFncHpkYnJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4Njc5ODYsImV4cCI6MjEwNjQ0Mzk4Nn0.IStw1z8LqrpMDRthM_KUnZRTpONxx9vH8ILkZPOLDOk"
         },
         body: JSON.stringify({
           eventoId: evento.id,
