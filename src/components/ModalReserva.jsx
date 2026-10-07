@@ -124,7 +124,11 @@ function ModalReserva({ evento, onCerrar }) {
         {/* Table Map */}
         <div className="mb-16">
           <div className="bg-black/60 p-4 rounded-[2.5rem] border border-amber-600/10 shadow-inner">
-            <img src={`/${evento.flyer || 'flyer-stage-night.jpg'}`} alt={`${evento.nombre} Table Map`} className="w-full h-auto rounded-2xl shadow-2xl border border-white/5" />
+            <img
+              src="/mesas-losfarmerz.jpg"
+              alt={`${evento.nombre} Table Map`}
+              className="w-full h-auto rounded-2xl shadow-2xl border border-white/5"
+            />
           </div>
         </div>
 
