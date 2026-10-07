@@ -81,7 +81,7 @@ function ModalReserva({ evento, onCerrar }) {
       evento: evento.id,
       numero: selectedTable,
       categoria: selectedCategory,
-      estado: 'pendiente_pago',
+      estado: 'vendida',
       nombre: customerName.trim(),
       email: customerEmail.trim(),
     });
