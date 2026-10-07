@@ -3,8 +3,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import Stripe from "https://esm.sh/stripe@20.1.2";
 
 const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY") || "";
-const PROJECT_URL = Deno.env.get("PROJECT_URL") || "";
-const SERVICE_ROLE_KEY = Deno.env.get("SERVICE_ROLE_KEY") || "";
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 
 serve(async (req) => {
   // Manejar preflight CORS
@@ -34,7 +34,7 @@ serve(async (req) => {
           const numero = parseInt(parts[1]);
           const categoria = parts[2];
 
-          const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY);
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
           await supabase.from("mesas").upsert({
             evento: eventoId,
             numero: numero,
