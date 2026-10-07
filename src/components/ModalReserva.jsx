@@ -27,7 +27,7 @@ function ModalReserva({ evento, onCerrar }) {
 
   const isMesaOccupied = (numero, categoria) => {
     return mesas.some(
-      (m) => m.numero === numero && m.categoria === categoria && m.estado !== 'libre'
+      (m) => m.numero === numero && m.categoria === categoria && (m.estado === 'vendida' || m.estado === 'bloqueada')
     );
   };
 
