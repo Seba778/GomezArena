@@ -22,7 +22,10 @@ function ModalReserva({ evento, onCerrar }) {
       else setMesas(data || []);
       setLoading(false);
     };
+
     fetchMesas();
+    const interval = setInterval(fetchMesas, 3000);
+    return () => clearInterval(interval);
   }, [evento.id]);
 
   const isMesaOccupied = (numero, categoria) => {
