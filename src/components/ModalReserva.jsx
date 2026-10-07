@@ -74,7 +74,10 @@ function ModalReserva({ evento, onCerrar }) {
     try {
       const res = await fetch("https://vvresxffmbeiqgpzdbrk.supabase.co/functions/v1/webhook-stripe", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2cmVzeGZmbWJlaXFncHpkYnJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4Njc5ODYsImV4cCI6MjEwNjQ0Mzk4Nn0.IStw1z8LqrpMDRthM_KUnZRTpONxx9vH8ILkZPOLDOk"
+        },
         body: JSON.stringify({
           eventoId: evento.id,
           numero: selectedTable,
