@@ -75,6 +75,22 @@ function ModalReserva({ evento, onCerrar }) {
       alert('Please enter your name and email');
       return;
     }
+
+    const { error } = await supabase.from('mesas').upsert({
+      evento: evento.id,
+      numero: selectedTable,
+      categoria: selectedCategory,
+      estado: 'vendida',
+      nombre: customerName.trim(),
+      email: customerEmail.trim(),
+    });
+
+    if (error) {
+      console.error('Error saving mesa:', error);
+      alert('Error saving reservation. Please try again.');
+      return;
+    }
+
     const emailParam = `?customer_email=${encodeURIComponent(customerEmail.trim())}`;
     window.location.href = link + emailParam;
   };
