@@ -66,34 +66,33 @@ function ModalReserva({ evento, onCerrar }) {
 
   const handleConfirmBooking = async () => {
     if (!selectedTable || !selectedCategory) return;
-    const catConfig = getCategoryConfig(selectedCategory);
-    const link = selectedCategory === 'red' ? evento.link_red : evento.link_blue;
-    if (!link) {
-      alert('Payment link not available yet. Please contact us.');
-      return;
-    }
     if (!customerName.trim() || !customerEmail.trim()) {
       alert('Please enter your name and email');
       return;
     }
 
-    const { error } = await supabase.from('mesas').upsert({
-      evento: evento.id,
-      numero: selectedTable,
-      categoria: selectedCategory,
-      estado: 'vendida',
-      nombre: customerName.trim(),
-      email: customerEmail.trim(),
-    });
-
-    if (error) {
-      console.error('Error saving mesa:', error);
-      alert('Error saving reservation. Please try again.');
-      return;
+    try {
+      const res = await fetch("https://vvresxffmbeiqgpzdbrk.supabase.co/functions/v1/crear-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventoId: evento.id,
+          numero: selectedTable,
+          categoria: selectedCategory,
+          nombre: customerName.trim(),
+          email: customerEmail.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Error creating Stripe session. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      alert("Connection error. Please try again.");
     }
-
-    const emailParam = `?customer_email=${encodeURIComponent(customerEmail.trim())}`;
-    window.location.href = link + emailParam;
   };
 
   return (
