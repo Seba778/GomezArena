@@ -15,7 +15,7 @@ function ModalReserva({ evento, onCerrar }) {
       setLoading(true);
       const { data, error } = await supabase
         .from('mesas')
-        .select('*')
+        .select('numero, categoria, estado, expira_en')
         .eq('evento', evento.id);
 
       if (error) console.error('Error fetching mesas:', error);
@@ -30,7 +30,11 @@ function ModalReserva({ evento, onCerrar }) {
 
   const isMesaOccupied = (numero, categoria) => {
     return mesas.some(
-      (m) => m.numero === numero && m.categoria === categoria && (m.estado === 'vendida' || m.estado === 'bloqueada')
+      (m) => m.numero === numero && m.categoria === categoria && (
+        m.estado === 'vendida' ||
+        m.estado === 'bloqueada' ||
+        (m.estado === 'reservada' && new Date(m.expira_en) > new Date())
+      )
     );
   };
 
@@ -76,23 +80,32 @@ function ModalReserva({ evento, onCerrar }) {
       return;
     }
 
-    const { error } = await supabase.from('mesas').upsert({
-      evento: evento.id,
-      numero: selectedTable,
-      categoria: selectedCategory,
-      estado: 'vendida',
-      nombre: customerName.trim(),
-      email: customerEmail.trim(),
+    // Temporary 15-min hold; the Stripe webhook marks the table 'vendida' once payment succeeds.
+    const { data: reserved, error } = await supabase.rpc('reservar_mesa', {
+      p_evento: evento.id,
+      p_numero: selectedTable,
+      p_categoria: selectedCategory,
+      p_nombre: customerName.trim(),
+      p_email: customerEmail.trim(),
     });
 
     if (error) {
-      console.error('Error saving mesa:', error);
+      console.error('Error reserving mesa:', error);
       alert('Error saving reservation. Please try again.');
       return;
     }
+    if (!reserved) {
+      alert('Sorry, this table was just taken. Please choose another one.');
+      setSelectedTable(null);
+      return;
+    }
 
-    const emailParam = `?customer_email=${encodeURIComponent(customerEmail.trim())}`;
-    window.location.href = link + emailParam;
+    // client_reference_id only allows letters, numbers, "-" and "_".
+    const params = new URLSearchParams({
+      client_reference_id: `${evento.id}__${selectedTable}__${selectedCategory}`,
+      prefilled_email: customerEmail.trim(),
+    });
+    window.location.href = `${link}?${params}`;
   };
 
   return (
