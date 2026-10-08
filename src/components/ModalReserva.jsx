@@ -7,8 +7,6 @@ function ModalReserva({ evento, onCerrar }) {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedTable, setSelectedTable] = useState(null);
-  const [customerName, setCustomerName] = useState('');
-  const [customerEmail, setCustomerEmail] = useState('');
 
   useEffect(() => {
     const fetchMesas = async () => {
@@ -75,18 +73,14 @@ function ModalReserva({ evento, onCerrar }) {
       alert('Payment link not available yet. Please contact us.');
       return;
     }
-    if (!customerName.trim() || !customerEmail.trim()) {
-      alert('Please enter your name and email');
-      return;
-    }
-
-    // Temporary 15-min hold; the Stripe webhook marks the table 'vendida' once payment succeeds.
+    // Temporary 15-min hold; the Stripe webhook marks the table 'vendida' (with the
+    // buyer's name/email from Stripe Checkout) once payment succeeds.
     const { data: reserved, error } = await supabase.rpc('reservar_mesa', {
       p_evento: evento.id,
       p_numero: selectedTable,
       p_categoria: selectedCategory,
-      p_nombre: customerName.trim(),
-      p_email: customerEmail.trim(),
+      p_nombre: null,
+      p_email: null,
     });
 
     if (error) {
@@ -103,7 +97,6 @@ function ModalReserva({ evento, onCerrar }) {
     // client_reference_id only allows letters, numbers, "-" and "_".
     const params = new URLSearchParams({
       client_reference_id: `${evento.id}__${selectedTable}__${selectedCategory}`,
-      prefilled_email: customerEmail.trim(),
     });
     window.location.href = `${link}?${params}`;
   };
@@ -239,20 +232,6 @@ function ModalReserva({ evento, onCerrar }) {
                     <p className="text-stone-400 text-sm italic mt-1">4 seats · Drinks not included</p>
                   </div>
                   <div className="flex flex-col items-center gap-3">
-                    <input
-                      type="text"
-                      placeholder="Your name"
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      className="bg-stone-900 border border-amber-600/30 rounded-full px-6 py-3 text-white placeholder-stone-500 focus:outline-none focus:border-amber-500 w-64 text-sm"
-                    />
-                    <input
-                      type="email"
-                      placeholder="Your email"
-                      value={customerEmail}
-                      onChange={(e) => setCustomerEmail(e.target.value)}
-                      className="bg-stone-900 border border-amber-600/30 rounded-full px-6 py-3 text-white placeholder-stone-500 focus:outline-none focus:border-amber-500 w-64 text-sm"
-                    />
                     <button onClick={handleConfirmBooking} className="bg-amber-600 hover:bg-amber-500 text-white font-black py-5 px-14 rounded-full transition-all shadow-xl uppercase tracking-widest text-xs">
                       Confirm Booking
                     </button>

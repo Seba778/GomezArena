@@ -55,3 +55,12 @@ $$;
 
 revoke all on function public.reservar_mesa(text, int, text, text, text) from public;
 grant execute on function public.reservar_mesa(text, int, text, text, text) to anon, authenticated;
+
+-- Sales report for the Supabase dashboard: one row per paid table. Not exposed to the website.
+create or replace view public.ventas with (security_invoker = true) as
+select evento, numero, categoria, nombre, email, monto, pagado_en, stripe_session_id
+from public.mesas
+where estado = 'vendida'
+order by evento, pagado_en;
+
+revoke all on public.ventas from anon, authenticated;
