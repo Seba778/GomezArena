@@ -56,7 +56,8 @@ serve(async (req) => {
     if (event.type !== "checkout.session.completed") return json({ received: true });
 
     const session = event.data.object;
-    if (session.payment_status !== "paid") {
+    // "no_payment_required" = total was $0 (e.g. a 100% promo code); still a completed booking.
+    if (session.payment_status !== "paid" && session.payment_status !== "no_payment_required") {
       console.log(`Session ${session.id} completed but not paid (${session.payment_status})`);
       return json({ received: true });
     }
