@@ -7,6 +7,7 @@ function ModalReserva({ evento, onCerrar }) {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedTable, setSelectedTable] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchMesas = async () => {
@@ -67,38 +68,29 @@ function ModalReserva({ evento, onCerrar }) {
   if (evento.precio_blue) categories.push('blue');
 
   const handleConfirmBooking = async () => {
-    if (!selectedTable || !selectedCategory) return;
-    const link = selectedCategory === 'red' ? evento.link_red : evento.link_blue;
-    if (!link) {
-      alert('Payment link not available yet. Please contact us.');
-      return;
-    }
-    // Temporary 15-min hold; the Stripe webhook marks the table 'vendida' (with the
-    // buyer's name/email from Stripe Checkout) once payment succeeds.
-    const { data: reserved, error } = await supabase.rpc('reservar_mesa', {
-      p_evento: evento.id,
-      p_numero: selectedTable,
-      p_categoria: selectedCategory,
-      p_nombre: null,
-      p_email: null,
+    if (!selectedTable || !selectedCategory || submitting) return;
+    setSubmitting(true);
+
+    // crear-checkout holds the table and opens a Stripe Checkout that expires in ~30 min.
+    // The Stripe webhook marks the table 'vendida' (with the buyer's name/email) once payment
+    // succeeds, or frees it when the checkout expires.
+    const { data, error } = await supabase.functions.invoke('crear-checkout', {
+      body: { evento: evento.id, numero: selectedTable, categoria: selectedCategory },
     });
 
-    if (error) {
-      console.error('Error reserving mesa:', error);
-      alert('Error saving reservation. Please try again.');
-      return;
-    }
-    if (!reserved) {
-      alert('Sorry, this table was just taken. Please choose another one.');
-      setSelectedTable(null);
+    if (error || !data?.url) {
+      setSubmitting(false);
+      if (error?.context?.status === 409) {
+        alert('Sorry, this table was just taken. Please choose another one.');
+        setSelectedTable(null);
+        return;
+      }
+      console.error('Error creating checkout:', error);
+      alert('Error starting payment. Please try again.');
       return;
     }
 
-    // client_reference_id only allows letters, numbers, "-" and "_".
-    const params = new URLSearchParams({
-      client_reference_id: `${evento.id}__${selectedTable}__${selectedCategory}`,
-    });
-    window.location.href = `${link}?${params}`;
+    window.location.href = data.url;
   };
 
   return (
@@ -232,8 +224,8 @@ function ModalReserva({ evento, onCerrar }) {
                     <p className="text-stone-400 text-sm italic mt-1">4 seats · Drinks not included</p>
                   </div>
                   <div className="flex flex-col items-center gap-3">
-                    <button onClick={handleConfirmBooking} className="bg-amber-600 hover:bg-amber-500 text-white font-black py-5 px-14 rounded-full transition-all shadow-xl uppercase tracking-widest text-xs">
-                      Confirm Booking
+                    <button onClick={handleConfirmBooking} disabled={submitting} className="bg-amber-600 hover:bg-amber-500 disabled:opacity-60 disabled:cursor-wait text-white font-black py-5 px-14 rounded-full transition-all shadow-xl uppercase tracking-widest text-xs">
+                      {submitting ? 'Redirecting...' : 'Confirm Booking'}
                     </button>
                     <p className="text-[9px] text-stone-600 uppercase tracking-wider">Secure payment · Stripe</p>
                   </div>

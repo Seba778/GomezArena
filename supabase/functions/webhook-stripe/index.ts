@@ -53,25 +53,47 @@ serve(async (req) => {
     }
 
     const event = JSON.parse(body);
-    if (event.type !== "checkout.session.completed") return json({ received: true });
-
     const session = event.data.object;
-    // "no_payment_required" = total was $0 (e.g. a 100% promo code); still a completed booking.
-    if (session.payment_status !== "paid" && session.payment_status !== "no_payment_required") {
-      console.log(`Session ${session.id} completed but not paid (${session.payment_status})`);
-      return json({ received: true });
-    }
 
-    // Set by ModalReserva on the Payment Link: "<eventoId>__<numero>__<categoria>"
+    // Set by crear-checkout: "<eventoId>__<numero>__<categoria>"
     const ref: string | null = session.client_reference_id;
     const [eventoId, numeroStr, categoria] = ref?.split("__") ?? [];
     const numero = parseInt(numeroStr);
     if (!eventoId || !numero || !categoria) {
-      console.error(`Session ${session.id} paid without a valid client_reference_id: ${ref}`);
+      console.error(`${event.type} for session ${session.id} without a valid client_reference_id: ${ref}`);
       return json({ received: true });
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    // Only touches the hold that belongs to this checkout session.
+    const holdOfThisSession = { evento: eventoId, numero, categoria, estado: "reservada", stripe_session_id: session.id };
+
+    switch (event.type) {
+      case "checkout.session.completed":
+        // "no_payment_required" = total was $0 (e.g. a 100% promo code); still a completed booking.
+        if (session.payment_status === "paid" || session.payment_status === "no_payment_required") break;
+        // Delayed payment methods: keep the table held until async_payment_succeeded/failed arrives.
+        console.log(`Session ${session.id} completed, payment pending (${session.payment_status})`);
+        await supabase
+          .from("mesas")
+          .update({ expira_en: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString() })
+          .match(holdOfThisSession);
+        return json({ received: true });
+
+      case "checkout.session.async_payment_succeeded":
+        break;
+
+      case "checkout.session.expired":
+      case "checkout.session.async_payment_failed": {
+        // Customer never paid: free the table right away.
+        const { error } = await supabase.from("mesas").delete().match(holdOfThisSession);
+        if (error) throw error;
+        return json({ received: true });
+      }
+
+      default:
+        return json({ received: true });
+    }
 
     const { data: existing, error: readError } = await supabase
       .from("mesas")

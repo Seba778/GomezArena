@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle2, ArrowLeft } from 'lucide-react';
 
 const EVENTS_INFO = {
+  "los-farmerz-2026": "LOS FARMERZ STAGE",
   "26-sep-2026": "STAGE NIGHT",
   "15-feb-2026": "PRIMER JARIPEO DEL AÑO",
   "20-feb-2026": "ALAMEÑOS DE LA SIERRA",
@@ -10,6 +11,7 @@ const EVENTS_INFO = {
 };
 
 const EVENTS_DATE = {
+  "los-farmerz-2026": "Saturday, October 24, 2026",
   "26-sep-2026": "Saturday, October 24, 2026",
   "15-feb-2026": "Sunday, February 15",
   "20-feb-2026": "Friday, February 20",
@@ -17,6 +19,8 @@ const EVENTS_DATE = {
 };
 
 const CATEGORY_NAMES = {
+  "red":                    "Red Table",
+  "blue":                   "Blue Table",
   "MesaRoja":               "Red Table",
   "MesaAzul":               "Blue Table",
   "MesaVipGold":            "VIP Table",
