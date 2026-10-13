@@ -33,6 +33,14 @@ const CATEGORY_NAMES = {
   "Amarillo Suite Premium": "Suite 20 People"
 };
 
+// Case- and whitespace-insensitive lookup, so "26-Sep-2026" or "Mesaazul " still match.
+const lookup = (map, key) => {
+  if (!key) return undefined;
+  const norm = key.trim().toLowerCase();
+  const match = Object.keys(map).find((k) => k.toLowerCase() === norm);
+  return match ? map[match] : undefined;
+};
+
 function Success() {
   const [searchParams] = useSearchParams();
   const [details, setDetails] = useState(null);
@@ -46,10 +54,10 @@ function Success() {
     if (type && eventId && number) {
       setDetails({
         type:      type === 'mesa' ? 'VIP Table' : 'Exclusive Suite',
-        eventName: EVENTS_INFO[eventId] || eventId,
-        date:      EVENTS_DATE[eventId] || eventId,
+        eventName: lookup(EVENTS_INFO, eventId) || eventId,
+        date:      lookup(EVENTS_DATE, eventId) || eventId,
         number,
-        category:  CATEGORY_NAMES[cat] || cat
+        category:  lookup(CATEGORY_NAMES, cat) || cat
       });
     }
   }, [searchParams]);
