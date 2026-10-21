@@ -60,12 +60,24 @@ function ModalReserva({ evento, onCerrar }) {
         numeros: Array.from({ length: evento.mesas_blue || 20 }, (_, i) => i + 41),
       };
     }
+    if (categoria === 'green' || categoria === 'GREEN TABLES') {
+      return {
+        label: 'GREEN TABLES',
+        price: evento.precio_green,
+        color: 'text-green-400',
+        borderColor: 'border-green-600/50',
+        bgColor: 'bg-green-900/10',
+        description: '4 seats · Drinks not included',
+        numeros: Array.from({ length: evento.mesas_green || 20 }, (_, i) => i + 81),
+      };
+    }
     return null;
   };
 
   const categories = [];
   if (evento.precio_red) categories.push('red');
   if (evento.precio_blue) categories.push('blue');
+  if (evento.precio_green) categories.push('green');
 
   const handleConfirmBooking = async () => {
     if (!selectedTable || !selectedCategory || submitting) return;
@@ -123,7 +135,7 @@ function ModalReserva({ evento, onCerrar }) {
         <div className="mb-16">
           <div className="bg-black/60 p-4 rounded-[2.5rem] border border-amber-600/10 shadow-inner">
             <img
-              src="/mesas-losfarmerz.jpg"
+              src="/los-farmerz-flyer.jpg"
               alt={`${evento.nombre} Table Map`}
               className="w-full h-auto rounded-2xl shadow-2xl border border-white/5"
             />
@@ -179,7 +191,7 @@ function ModalReserva({ evento, onCerrar }) {
               {selectedCategory && (
                 <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-10 gap-3">
                   {getCategoryConfig(selectedCategory).numeros.map((n) => {
-                    const occupied = isMesaOccupied(n, selectedCategory === 'red' ? 'red' : 'blue');
+                    const occupied = isMesaOccupied(n, selectedCategory);
                     const isSelected = selectedTable === n;
                     return (
                       <button
@@ -193,7 +205,9 @@ function ModalReserva({ evento, onCerrar }) {
                               ? 'bg-amber-600 border-amber-500 text-white shadow-xl scale-110'
                               : selectedCategory === 'red'
                                 ? 'bg-red-900/20 border-red-600/30 text-red-300 hover:bg-red-900/40'
-                                : 'bg-blue-900/20 border-blue-600/30 text-blue-300 hover:bg-blue-900/40'
+                                : selectedCategory === 'green'
+                                  ? 'bg-green-900/20 border-green-600/30 text-green-300 hover:bg-green-900/40'
+                                  : 'bg-blue-900/20 border-blue-600/30 text-blue-300 hover:bg-blue-900/40'
                           }`}
                       >
                         {n}

@@ -21,6 +21,7 @@ const EVENTS_DATE = {
 const CATEGORY_NAMES = {
   "red":                    "Red Table",
   "blue":                   "Blue Table",
+  "green":                  "Green Table",
   "MesaRoja":               "Red Table",
   "MesaAzul":               "Blue Table",
   "MesaVipGold":            "VIP Table",

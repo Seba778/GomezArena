@@ -16,7 +16,8 @@ const EVENTOS: Record<
     nombre: "Los Farmerz Stage",
     categorias: {
       red: { label: "Red Table", precio: 70000, desde: 21, hasta: 40 },
-      blue: { label: "Blue Table", precio: 60000, desde: 41, hasta: 60 },
+      blue: { label: "Blue Table", precio: 60000, desde: 41, hasta: 80 },
+      green: { label: "Green Table", precio: 50000, desde: 81, hasta: 100 },
     },
   },
 };
