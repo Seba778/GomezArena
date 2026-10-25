@@ -8,12 +8,18 @@ const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY") || "";
 const SITE_URL = "https://www.gomezarenaofficial.com";
 
 // Prices are defined here (server side) so they can't be changed from the browser. Amounts in cents.
+// Only events with activo: true can be bought. Keep it in sync with activo in App.jsx.
 const EVENTOS: Record<
   string,
-  { nombre: string; categorias: Record<string, { label: string; precio: number; desde: number; hasta: number }> }
+  {
+    nombre: string;
+    activo: boolean;
+    categorias: Record<string, { label: string; precio: number; desde: number; hasta: number }>;
+  }
 > = {
   "los-farmerz-2026": {
     nombre: "Los Farmerz Stage",
+    activo: false,
     categorias: {
       red: { label: "Red Table", precio: 70000, desde: 21, hasta: 40 },
       blue: { label: "Blue Table", precio: 60000, desde: 41, hasta: 80 },
@@ -50,7 +56,7 @@ serve(async (req) => {
     const ev = EVENTOS[evento];
     const cat = ev?.categorias[categoria];
     const n = Number(numero);
-    if (!ev || !cat || !Number.isInteger(n) || n < cat.desde || n > cat.hasta) {
+    if (!ev || !ev.activo || !cat || !Number.isInteger(n) || n < cat.desde || n > cat.hasta) {
       return json({ error: "invalid" }, 400);
     }
 

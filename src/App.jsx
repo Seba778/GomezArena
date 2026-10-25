@@ -19,7 +19,7 @@ function MainLanding() {
       nombre: 'Los Farmerz Stage',
       slug: 'los-farmerz',
       fecha: '2026-10-24',
-      activo: true,
+      activo: false,
       precio_red: 700,
       precio_blue: 600,
       precio_green: 500,
@@ -32,6 +32,8 @@ function MainLanding() {
       link_blue: 'https://buy.stripe.com/bJe9AV9fM6Ka9q56ekgIo02'
     }
   ];
+  // Only events with activo: true are shown. Set it to false to take an event off the site.
+  const eventosActivos = eventos.filter((e) => e.activo);
   const loading = false;
 
   useEffect(() => {
@@ -54,7 +56,7 @@ function MainLanding() {
 
       <main className="max-w-7xl mx-auto px-4 md:px-6 space-y-32 mt-16 pb-20">
         <Hero />
-        <Eventos eventos={eventos} onBookTable={openReservationModal} />
+        <Eventos eventos={eventosActivos} onBookTable={openReservationModal} />
         <Galeria />
       </main>
 
